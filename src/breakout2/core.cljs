@@ -19,7 +19,7 @@
                  (for [x (range 50 450 25)
                        y (range 50 150 20)]
                    {:x x :y y :x2 40 :y2 20})))
-
+(def misses (reagent/atom 0))
 
 
 
@@ -61,10 +61,17 @@
       ))
   
   ;; bat missed the ball
+  ;; (if (> @bally 490)
+  ;;   (do
+  ;;     (reset! ballvy 0)
+  ;;     (reset! ballvx 0)))
   (if (> @bally 490)
     (do
-      (reset! ballvy 0)
-      (reset! ballvx 0)))
+      ;; we know we misses
+      (reset! misses (+ 1 @misses))
+      ;; bounce back anyway
+      (reset! bally 449)
+      (reset! ballvy (- @ballvy))))
 
   ;; bat hit ball
   (if (and (> @bally 450)
@@ -348,20 +355,22 @@
 (defn get-app-element []
   (gdom/getElement "app"))
 
-(defn hello-world []  
+(defn breakout []  
   [:div
-   [:h1 (:text @app-state)]
-   [:h3 "Edit this in src/canvas/core.cljs and watch it change!"]
+   ;;[:h1 (:text @app-state)]
+   ;;[:h3 "Edit this in src/canvas/core.cljs and watch it change!"]
    ;;[:canvas {:height 500 :width 500 :style {:background-color "chocolate" :border "1px solid #000000"}}]
+   [:div
    [div-with-canvas]
-   [:p @status]
+    [:p @status]
+    ]
    ;;[:p "ball x y = " @ballx "," @bally]
    ])
 
 
 
 (defn mount [el]
-  (reagent/render-component [hello-world] el)
+  (reagent/render-component [breakout] el)
   (.addEventListener js/window "resize" on-window-resize)
   (set! (.. js/window -onmousemove) myMouseMove)
   (set! (.. js/window -onmousedown) myMouseMove)
